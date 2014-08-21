@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Index</title>
+</head>
+<body>
+	<h1>Hola {{ user.username }}</h1>
+	<a href="/log-out/">Salir</a>
+
+	<div>
+		<form>
+			{{ form.as_p }}
+			<button id="pregunta">Pregunta!</button>
+		</form>
+	</div>
+
+	<section id="preguntas">
+		{% for question in questions %}
+			<article>
+				<p>{{ question.title }} - {{ question.user }}</p>
+			</article>
+		{% endfor %}
+	</section>
+
+	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	<script src="/static/js/jquery.js"></script>
+
+	<script>
+		var socket = io.connect('http://localhost:3000');
+
+		$('#pregunta').on('click', HiceClick);
+
+		function HiceClick(e){
+			console.log("algo");
+			e.preventDefault();
+			var datos = {
+				username : '{{user.username}}',
+ 				title : $('#id_title').val(),
+				content : $('#id_content').val()
+			}
+
+			socket.emit('preguntando', datos);
+
+		}
+
+		socket.on('devolviendo pregunta', function(data){
+			var data = JSON.parse(data);
+			$('#preguntas').prepend('<article><p>' + data.title + ' - '+ data.username +'</p></article>')
+		});
+
+	</script>
+</body>
+</html>
+
+
+
